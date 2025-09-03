@@ -1,0 +1,105 @@
+{
+  "project": {
+    "name": "SEO Learning Platform",
+    "timeline": "36_hours",
+    "start_time": "2025-09-03T16:00:00Z",
+    "manager": "Prometheus",
+    "methodology": "BMAD v4 + PRP"
+  },
+  "teams": {
+    "atlas": {
+      "lead": "Atlas-1",
+      "agents": [
+        { "id": "atlas-1", "branch": "atlas-1", "role": "Team Lead", "status": "ready" },
+        { "id": "atlas-2", "branch": "atlas-2", "role": "Frontend Architect", "status": "ready" },
+        { "id": "atlas-3", "branch": "atlas-3", "role": "React Developer", "status": "ready" },
+        { "id": "atlas-4", "branch": "atlas-4", "role": "UI/UX Developer", "status": "ready" },
+        { "id": "atlas-5", "branch": "atlas-5", "role": "Component Builder", "status": "ready" },
+        { "id": "atlas-6", "branch": "atlas-6", "role": "State Manager", "status": "ready" },
+        { "id": "atlas-7", "branch": "atlas-7", "role": "API Integrator", "status": "ready" },
+        { "id": "atlas-8", "branch": "atlas-8", "role": "Form Handler", "status": "ready" },
+        { "id": "atlas-9", "branch": "atlas-9", "role": "Animation Expert", "status": "ready" },
+        { "id": "atlas-10", "branch": "atlas-10", "role": "Performance Optimizer", "status": "ready" }
+      ],
+      "focus": "Core Development",
+      "tasks_assigned": 45
+    },
+    "aurora": {
+      "lead": "Aurora-1",
+      "agents": [
+        { "id": "aurora-1", "branch": "aurora-1", "role": "Team Lead", "status": "ready" },
+        { "id": "aurora-2", "branch": "aurora-2", "role": "Backend Architect", "status": "ready" },
+        { "id": "aurora-3", "branch": "aurora-3", "role": "Database Engineer", "status": "ready" },
+        { "id": "aurora-4", "branch": "aurora-4", "role": "API Developer", "status": "ready" },
+        { "id": "aurora-5", "branch": "aurora-5", "role": "Authentication Expert", "status": "ready" },
+        { "id": "aurora-6", "branch": "aurora-6", "role": "Payment Integrator", "status": "ready" },
+        { "id": "aurora-7", "branch": "aurora-7", "role": "WebSocket Developer", "status": "ready" },
+        { "id": "aurora-8", "branch": "aurora-8", "role": "AI Service Developer", "status": "ready" },
+        { "id": "aurora-9", "branch": "aurora-9", "role": "Cron Job Manager", "status": "ready" },
+        { "id": "aurora-10", "branch": "aurora-10", "role": "Email Service Developer", "status": "ready" }
+      ],
+      "focus": "Infrastructure & Backend",
+      "tasks_assigned": 52
+    },
+    "phoenix": {
+      "lead": "Phoenix-1",
+      "agents": [
+        { "id": "phoenix-1", "branch": "phoenix-1", "role": "Team Lead", "status": "ready" },
+        { "id": "phoenix-2", "branch": "phoenix-2", "role": "QA Architect", "status": "ready" },
+        { "id": "phoenix-3", "branch": "phoenix-3", "role": "Unit Test Developer", "status": "ready" },
+        { "id": "phoenix-4", "branch": "phoenix-4", "role": "Integration Tester", "status": "ready" },
+        { "id": "phoenix-5", "branch": "phoenix-5", "role": "E2E Test Developer", "status": "ready" },
+        { "id": "phoenix-6", "branch": "phoenix-6", "role": "Performance Tester", "status": "ready" },
+        { "id": "phoenix-7", "branch": "phoenix-7", "role": "Security Tester", "status": "ready" },
+        { "id": "phoenix-8", "branch": "phoenix-8", "role": "Accessibility Tester", "status": "ready" },
+        { "id": "phoenix-9", "branch": "phoenix-9", "role": "Bug Tracker", "status": "ready" },
+        { "id": "phoenix-10", "branch": "phoenix-10", "role": "Test Reporter", "status": "ready" }
+      ],
+      "focus": "Testing & Quality Assurance",
+      "tasks_assigned": 38
+    },
+    "sentinel": {
+      "lead": "Sentinel-1",
+      "agents": [
+        { "id": "sentinel-1", "branch": "sentinel-1", "role": "Security Lead", "status": "ready" },
+        { "id": "sentinel-2", "branch": "sentinel-2", "role": "DevOps Engineer", "status": "ready" },
+        { "id": "sentinel-3", "branch": "sentinel-3", "role": "Monitoring Specialist", "status": "ready" }
+      ],
+      "focus": "Security & Monitoring",
+      "tasks_assigned": 12
+    }
+  },
+  "communication": {
+    "check_in_interval": "20_minutes",
+    "alert_levels": ["GREEN", "YELLOW", "RED"],
+    "channels": {
+      "general": "ws://localhost:5000/general",
+      "team_atlas": "ws://localhost:5000/atlas",
+      "team_aurora": "ws://localhost:5000/aurora",
+      "team_phoenix": "ws://localhost:5000/phoenix",
+      "team_sentinel": "ws://localhost:5000/sentinel",
+      "emergency": "ws://localhost:5000/emergency"
+    }
+  },
+  "github": {
+    "repo": "devklg/seo-learning-platform",
+    "main_branch": "main",
+    "integration_branch": "prometheus-integration",
+    "workflow": "feature-branch-merge"
+  },
+  "chromadb": {
+    "main_collection": "seo_learning_platform_dev",
+    "agent_hub": "agent_communication_hub",
+    "workspaces": {
+      "aurora": "aurora_workspace",
+      "phoenix": "phoenix_workspace",
+      "sentinel": "sentinel_workspace",
+      "sage": "sage_workspace"
+    }
+  },
+  "dashboard": {
+    "url": "http://localhost:3000",
+    "api": "http://localhost:5000/api",
+    "websocket": "ws://localhost:5000"
+  }
+}
