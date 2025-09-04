@@ -1,0 +1,138 @@
+version: '3.8'
+
+services:
+  # MongoDB for Agent System
+  mongodb-agents:
+    image: mongo:7.0
+    container_name: seo-agents-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_agent_data:/data/db
+      - mongodb_agent_config:/data/configdb
+    environment:
+      MONGO_INITDB_DATABASE: seo-learning-agents
+      MONGO_INITDB_ROOT_USERNAME: prometheus
+      MONGO_INITDB_ROOT_PASSWORD: agent-system-2025
+    networks:
+      - agent-network
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=27017"
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: seo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - agent-network
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=6379"
+
+  # RabbitMQ for message queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: seo-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: prometheus
+      RABBITMQ_DEFAULT_PASS: agent-queue-2025
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - agent-network
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=15672"
+
+  # Grafana Agent for metrics collection
+  grafana-agent:
+    image: grafana/agent:latest
+    container_name: seo-grafana-agent
+    restart: unless-stopped
+    volumes:
+      - ./grafana/agent.yaml:/etc/agent/agent.yaml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      GRAFANA_CLOUD_API_KEY: "${GRAFANA_API_KEY}"
+      GRAFANA_CLOUD_URL: "https://devklg.grafana.net"
+      PROMETHEUS_URL: "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push"
+      LOKI_URL: "https://logs-prod-012.grafana.net/loki/api/v1/push"
+    command: --config.file=/etc/agent/agent.yaml
+    networks:
+      - agent-network
+    depends_on:
+      - mongodb-agents
+      - redis
+      - rabbitmq
+
+  # Agent Dashboard Backend
+  agent-dashboard:
+    image: node:18-alpine
+    container_name: agent-dashboard-server
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb-agents
+      - redis
+      - rabbitmq
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      # MongoDB
+      MONGODB_URI: mongodb://prometheus:agent-system-2025@mongodb-agents:27017/seo-learning-agents?authSource=admin
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # RabbitMQ
+      RABBITMQ_URL: amqp://prometheus:agent-queue-2025@rabbitmq:5672
+      # ChromaDB (local)
+      CHROMADB_HOST: host.docker.internal
+      CHROMADB_PORT: 8000
+      # Grafana
+      GRAFANA_URL: https://devklg.grafana.net
+      # Security
+      JWT_SECRET: prometheus-seo-platform-2025
+      # GitHub
+      GITHUB_REPO: devklg/seo-learning-platform
+      GITHUB_OWNER: devklg
+      # Agent Config
+      AGENT_COUNT: 32
+      PROJECT_TIMELINE: 36_HOURS
+      CHECK_IN_INTERVAL: 20
+    volumes:
+      - ./agent-dashboard/server:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm start"
+    networks:
+      - agent-network
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=5000"
+
+volumes:
+  mongodb_agent_data:
+    name: seo-agents-mongodb-data
+  mongodb_agent_config:
+    name: seo-agents-mongodb-config
+  redis_data:
+    name: seo-redis-data
+  rabbitmq_data:
+    name: seo-rabbitmq-data
+
+networks:
+  agent-network:
+    name: seo-agent-network
+    driver: bridge

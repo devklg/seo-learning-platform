@@ -1,0 +1,25 @@
+{
+  "name": "seo-learning-platform",
+  "version": "1.0.0",
+  "description": "SEO Learning Platform - Agent Orchestration System",
+  "main": "initialize-agents.js",
+  "scripts": {
+    "start": "node initialize-agents.js",
+    "setup": "npm install && docker-compose up -d",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": [
+    "seo",
+    "learning",
+    "agents",
+    "prometheus"
+  ],
+  "author": "Kevin Gardner",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^6.3.0",
+    "node-fetch": "^3.3.2"
+  }
+}

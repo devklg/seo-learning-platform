@@ -1,0 +1,105 @@
+server:
+  log_level: info
+
+metrics:
+  global:
+    scrape_interval: 15s
+    external_labels:
+      cluster: seo-platform
+      namespace: production
+    remote_write:
+      - url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push
+        basic_auth:
+          username: ${METRICS_USERNAME}
+          password: ${GRAFANA_API_KEY}
+        write_relabel_configs:
+          # Adaptive metrics - only send what matters
+          - source_labels: [__name__]
+            regex: "up|agent_.*|mongodb_.*|redis_.*|rabbitmq_.*|http_.*|process_.*"
+            action: keep
+
+  configs:
+    - name: agent-metrics
+      scrape_configs:
+        # Self monitoring
+        - job_name: grafana-agent
+          static_configs:
+            - targets: ['127.0.0.1:12345']
+        
+        # MongoDB metrics
+        - job_name: mongodb
+          static_configs:
+            - targets: ['mongodb-agents:27017']
+              labels:
+                service: mongodb
+                team: aurora
+                agent_count: "10"
+        
+        # Redis metrics
+        - job_name: redis
+          static_configs:
+            - targets: ['redis:6379']
+              labels:
+                service: redis
+                team: atlas
+                agent_count: "10"
+        
+        # RabbitMQ metrics
+        - job_name: rabbitmq
+          metrics_path: /api/metrics
+          static_configs:
+            - targets: ['rabbitmq:15692']
+              labels:
+                service: rabbitmq
+                team: prometheus
+                agent_count: "32"
+        
+        # Agent Dashboard metrics
+        - job_name: agent-dashboard
+          static_configs:
+            - targets: ['agent-dashboard:5000']
+              labels:
+                service: dashboard
+                team: prometheus
+                
+        # Docker container metrics
+        - job_name: docker
+          docker_sd_configs:
+            - host: unix:///var/run/docker.sock
+              refresh_interval: 30s
+          relabel_configs:
+            - source_labels: [__meta_docker_container_name]
+              target_label: container
+
+logs:
+  configs:
+    - name: default
+      clients:
+        - url: https://logs-prod-012.grafana.net/loki/api/v1/push
+          basic_auth:
+            username: ${LOGS_USERNAME}
+            password: ${GRAFANA_API_KEY}
+      positions:
+        filename: /tmp/positions.yaml
+      scrape_configs:
+        - job_name: containers
+          docker_sd_configs:
+            - host: unix:///var/run/docker.sock
+              refresh_interval: 5s
+          relabel_configs:
+            - source_labels: ['__meta_docker_container_name']
+              regex: '/(.*)'
+              target_label: 'container'
+
+integrations:
+  agent:
+    enabled: true
+  node_exporter:
+    enabled: true
+    disable_collectors:
+      - mdadm
+  prometheus_remote_write:
+    - url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push
+      basic_auth:
+        username: ${METRICS_USERNAME}
+        password: ${GRAFANA_API_KEY}
